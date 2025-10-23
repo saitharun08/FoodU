@@ -1,0 +1,8 @@
+Django>=4.2,<5.0
+djangorestframework>=3.14
+channels>=4.0
+channels-redis>=4.0
+psycopg2-binary>=2.9    # for PostgreSQL (optional)
+gunicorn>=20.1.0        # for deployment (ASGI adapter like daphne/gunicorn in prod)
+python-dotenv>=1.0.0    # load env vars from .env locally
+whitenoise>=6.5         # static file serving for simple deployments
