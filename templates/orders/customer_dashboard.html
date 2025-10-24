@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Customer Dashboard</h3>
+<a href="{% url 'create_booking' %}" class="btn btn-success mb-3">Create New Booking</a>
+<table class="table table-bordered">
+  <tr><th>ID</th><th>Food</th><th>Status</th><th>Actions</th></tr>
+  {% for b in bookings %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.food_item }}</td>
+    <td>{{ b.status }}</td>
+    <td>
+      {% if b.status == 'created' %}
+        <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger btn-sm">Cancel</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

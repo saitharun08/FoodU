@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Partner Dashboard</h3>
+<table class="table table-hover">
+  <tr><th>ID</th><th>Food</th><th>Status</th><th>Action</th></tr>
+  {% for b in bookings %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.food_item }}</td>
+    <td>{{ b.status }}</td>
+    <td>
+      {% if b.status != 'delivered' %}
+        <a href="{% url 'update_status' b.id %}" class="btn btn-primary btn-sm">Next Stage</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

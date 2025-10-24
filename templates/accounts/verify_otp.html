@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Verify OTP</h3>
+<p>We’ve sent a static OTP <b>1234</b> to {{ mobile }}</p>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-success">Verify & Login</button>
+</form>
+{% endblock %}

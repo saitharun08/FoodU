@@ -1,9 +1,10 @@
 from django.urls import path
 from django.http import HttpResponse
+from . import views
 
-def placeholder_view(request):
-    return HttpResponse("Accounts placeholder")
 
 urlpatterns = [
-    path("", placeholder_view, name="accounts-home"),
+    path('login/', views.mobile_login, name='mobile_login'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('unauthorized/', views.unauthorized, name='unauthorized')
 ]
