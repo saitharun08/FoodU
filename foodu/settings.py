@@ -154,5 +154,9 @@ CHANNEL_LAYERS = {
     },
 }
 
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
-
+# Temporary dev layer (use Redis later)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
