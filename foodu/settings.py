@@ -11,18 +11,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import environ
-
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, True)
-)
+# If you want to read from .env without 'environ', do it manually:
+env_path = BASE_DIR / ".env"
+if env_path.exists():
+    with open(env_path) as file:
+        for line in file:
+            if line.startswith("#") or not line.strip():
+                continue
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip())
 
-# Read the .env file
-environ.Env.read_env(BASE_DIR / ".env")
+# Example: Get debug from environment or fall back to True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -145,14 +150,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ASGI_APPLICATION = "foodu.asgi.application"
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [env("REDIS_URL")],  # env from .env via python-dotenv or dj-database-url
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [env("REDIS_URL")],  # env from .env via python-dotenv or dj-database-url
+#         },
+#     },
+# }
 
 # Temporary dev layer (use Redis later)
 CHANNEL_LAYERS = {
