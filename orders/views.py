@@ -27,12 +27,18 @@ def create_booking(request):
 @role_required(['customer'])
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, customer=request.user)
+    
+    # Prevent cancelling if partner is assigned
+    if booking.partner or booking.assigned_to:
+        messages.error(request, "Cannot cancel order. A delivery partner has already been assigned to your order.")
+        return redirect('customer_dashboard')
+    
     if booking.status == 'created':
         booking.status = 'cancelled'
         booking.save()
         messages.info(request, "Booking cancelled.")
     else:
-        messages.error(request, "Cannot cancel once assigned or started.")
+        messages.error(request, "Cannot cancel order in current status.")
     return redirect('customer_dashboard')
 
 @role_required(['admin'])
@@ -44,6 +50,12 @@ def admin_dashboard(request):
         booking_id = request.POST.get('booking_id')
         partner_id = request.POST.get('partner_id')
         booking = Booking.objects.get(id=booking_id)
+        
+        # Prevent assigning partner to cancelled orders
+        if booking.status == 'cancelled':
+            messages.error(request, "Cannot assign partner to a cancelled order.")
+            return redirect('admin_dashboard')
+        
         partner = User.objects.get(id=partner_id)
         booking.partner = partner
         # Keep both fields in sync for templates that reference either
