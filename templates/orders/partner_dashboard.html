@@ -13,6 +13,13 @@
         <a href="{% url 'update_status' b.id %}" class="btn btn-primary btn-sm">Next Stage</a>
       {% endif %}
     </td>
+    <td>
+     {% if b.partner %}
+  <a href="#" class="btn btn-sm btn-outline-primary open-chat" data-booking-id="{{ b.id }}" data-booking-status="{{ b.status }}">
+    Chat
+  </a>
+{% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>

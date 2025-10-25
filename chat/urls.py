@@ -1,9 +1,7 @@
 from django.urls import path
 from django.http import HttpResponse
-
-def placeholder_view(request):
-    return HttpResponse("Chat placeholder")
+from . import views
 
 urlpatterns = [
-    path("", placeholder_view, name="chat-home"),
+    path('history/<int:booking_id>/', views.history, name='chat_history')
 ]
