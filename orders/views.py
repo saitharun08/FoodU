@@ -58,21 +58,42 @@ def admin_dashboard(request):
 
 @role_required(['partner'])
 def partner_dashboard(request):
-    bookings = Booking.objects.filter(partner=request.user)
-    return render(request, 'orders/partner_dashboard.html', {'bookings': bookings})
+    # Get all bookings for this partner
+    all_bookings = Booking.objects.filter(partner=request.user)
+    
+    # Separate undelivered and delivered bookings
+    undelivered_bookings = all_bookings.exclude(status='delivered').exclude(status='cancelled').order_by('created_at')
+    delivered_bookings = all_bookings.filter(status='delivered').order_by('-created_at')
+    
+    return render(request, 'orders/partner_dashboard.html', {
+        'undelivered_bookings': undelivered_bookings,
+        'delivered_bookings': delivered_bookings
+    })
 
 @role_required(['partner'])
 def update_status(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, partner=request.user)
-    flow = ['assigned', 'started', 'reached', 'collected', 'delivered']
-    current_index = flow.index(booking.status) if booking.status in flow else -1
-
-    if current_index + 1 < len(flow):
-        booking.status = flow[current_index + 1]
-        booking.save()
-        messages.success(request, f"Status updated to {booking.status}")
+    
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status:
+            booking.status = new_status.lower()
+            booking.save()
+            messages.success(request, f"Status updated to {booking.status.title()}")
+        else:
+            messages.error(request, "Please select a status.")
     else:
-        messages.info(request, "Already delivered.")
+        # Keep the old flow logic for backward compatibility
+        flow = ['assigned', 'started', 'reached', 'collected', 'delivered']
+        current_index = flow.index(booking.status) if booking.status in flow else -1
+
+        if current_index + 1 < len(flow):
+            booking.status = flow[current_index + 1]
+            booking.save()
+            messages.success(request, f"Status updated to {booking.status}")
+        else:
+            messages.info(request, "Already delivered.")
+    
     return redirect('partner_dashboard')
 
 @role_required(['admin'])

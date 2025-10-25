@@ -7,35 +7,83 @@
     <p class="text-muted">View your assigned bookings and update delivery status.</p>
 </div>
 
-<div class="card p-4">
-    <h5>Assigned Bookings</h5>
+<!-- Undelivered Bookings Section -->
+<div class="card p-4 mb-4">
+    <h5>Undelivered Orders</h5>
     <hr>
-    {% for booking in bookings %}
-        <div class="border-bottom py-2 d-flex justify-content-between align-items-center">
-            <div>   
-                <strong>Order #{{ booking.id }}</strong> — {{ booking.status }}
-                <br><small>Customer: {{ booking.customer.mobile }}</small>
-                <br><small>Pickup: {{ booking.pickup_location }} → Drop: {{ booking.drop_location }}</small>
+    {% for booking in undelivered_bookings %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong>
+                <br><small>Customer Number: {{ booking.customer.mobile }}</small>
+                <br>
+                <span class="text-muted">Status:</span>
+                <span class="fw-bold text-{% if booking.status == 'delivered' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">{{ booking.status|title }}</span>
+                {% if booking.food_item %}
+                    <br><small>Order Details: {{ booking.food_item }}</small>
+                {% endif %}
+                {% if booking.address %}
+                    <br><small>Address: {{ booking.address }}</small>
+                {% endif %}
+                {% if booking.created_at %}
+                    <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+                {% endif %}
             </div>
             <div class="text-end">
-                {% if booking.status != 'Delivered' and booking.status != 'Cancelled' %}
-                    <form method="POST" action="{% url 'update_status' booking.id %}">
+                {% if booking.status != 'delivered' and booking.status != 'cancelled' %}
+                    <form method="POST" action="{% url 'update_status' booking.id %}" class="mb-2">
                         {% csrf_token %}
                         <select name="status" class="form-select form-select-sm mb-2" required>
                             <option value="">Update Status</option>
-                            <option value="Start">Start</option>
-                            <option value="Reached">Reached</option>
-                            <option value="Collected">Collected</option>
-                            <option value="Delivered">Delivered</option>
+                            <option value="started" {% if booking.status == 'assigned' %}selected{% endif %}>Start</option>
+                            <option value="reached" {% if booking.status == 'started' %}selected{% endif %}>Reached</option>
+                            <option value="collected" {% if booking.status == 'reached' %}selected{% endif %}>Collected</option>
+                            <option value="delivered" {% if booking.status == 'collected' %}selected{% endif %}>Delivered</option>
                         </select>
-                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Update Status</button>
                     </form>
                 {% endif %}
                 <button class="btn btn-sm btn-success open-chat" data-booking-id="{{ booking.id }}">Chat</button>
             </div>
         </div>
     {% empty %}
-        <p>No bookings assigned yet.</p>
+        <p class="text-muted">No undelivered orders.</p>
+    {% endfor %}
+</div>
+
+<!-- Separator Line -->
+<div class="my-4">
+    <hr class="border-2">
+</div>
+
+<!-- Delivered Bookings Section -->
+<div class="card p-4">
+    <h5>Delivered Orders</h5>
+    <hr>
+    {% for booking in delivered_bookings %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong>
+                <br><small>Customer Number: {{ booking.customer.mobile }}</small>
+                <br>
+                <span class="text-muted">Status:</span>
+                <span class="fw-bold text-success">{{ booking.status|title }}</span>
+                {% if booking.food_item %}
+                    <br><small>Order Details: {{ booking.food_item }}</small>
+                {% endif %}
+                {% if booking.address %}
+                    <br><small>Address: {{ booking.address }}</small>
+                {% endif %}
+                {% if booking.created_at %}
+                    <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+                {% endif %}
+            </div>
+            <div>
+                <span class="badge bg-success">Delivered</span>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">No delivered orders yet.</p>
     {% endfor %}
 </div>
 
