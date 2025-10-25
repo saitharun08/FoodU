@@ -6,7 +6,9 @@ $(function () {
     e.preventDefault();
     currentBooking = $(this).data("booking-id");
     $("#chatMessages").html("");
-    $("#chatModal").modal("show");
+    // Use Bootstrap 5 modal API
+    const chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
+    chatModal.show();
 
     const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
     const wsUrl = ws_scheme + "://" + window.location.host + "/ws/chat/" + currentBooking + "/";
@@ -19,7 +21,16 @@ $(function () {
     };
 
     socket.onopen = () => console.log("Connected to chat for booking", currentBooking);
-    socket.onclose = () => console.log("Chat closed");
+    socket.onclose = (event) => {
+      console.log("Chat closed", event.code, event.reason);
+      if (event.code !== 1000) {
+        alert("Chat connection closed. Please make sure the order is assigned to a partner.");
+      }
+    };
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      alert("Failed to connect to chat. Please refresh the page and try again.");
+    };
   });
 
   $("#sendChatBtn").click(function () {
@@ -27,6 +38,13 @@ $(function () {
     if (!message || socket.readyState !== WebSocket.OPEN) return;
     socket.send(JSON.stringify({ message: message }));
     $("#chatInput").val("");
+  });
+
+  // Allow Enter key to send message
+  $("#chatInput").keypress(function (e) {
+    if (e.which === 13) { // Enter key
+      $("#sendChatBtn").click();
+    }
   });
 
   function appendMessage(data) {
