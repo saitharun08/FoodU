@@ -7,7 +7,7 @@ from accounts.models import User
 
 @role_required(['customer'])
 def customer_dashboard(request):
-    bookings = Booking.objects.filter(customer=request.user)
+    bookings = Booking.objects.filter(customer=request.user).order_by('-created_at')
     return render(request, 'orders/customer_dashboard.html', {'bookings': bookings})
 
 @role_required(['customer'])
@@ -71,3 +71,15 @@ def update_status(request, booking_id):
     else:
         messages.info(request, "Already delivered.")
     return redirect('partner_dashboard')
+
+@role_required(['admin'])
+def assign_partner(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    if request.method == 'POST':
+        partner_id = request.POST.get('partner_id')
+        if partner_id:
+            partner = User.objects.get(id=partner_id)
+            booking.assigned_to = partner
+            booking.save()
+    return redirect('admin_dashboard')
+

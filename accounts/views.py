@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from .models import User
 from .forms import MobileLoginForm, OtpForm
 from django.http import HttpResponse
@@ -55,3 +55,8 @@ def verify_otp(request):
 
 def unauthorized(request):
     return HttpResponse("❌ You are not authorized to view this page.")
+
+def user_logout(request):
+    logout(request)
+    return redirect('mobile_login')
+

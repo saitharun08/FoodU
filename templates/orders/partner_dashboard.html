@@ -1,26 +1,44 @@
 {% extends 'base.html' %}
+{% block title %}Partner Dashboard{% endblock %}
+
 {% block content %}
-<h3>Partner Dashboard</h3>
-<table class="table table-hover">
-  <tr><th>ID</th><th>Food</th><th>Status</th><th>Action</th></tr>
-  {% for b in bookings %}
-  <tr>
-    <td>{{ b.id }}</td>
-    <td>{{ b.food_item }}</td>
-    <td>{{ b.status }}</td>
-    <td>
-      {% if b.status != 'delivered' %}
-        <a href="{% url 'update_status' b.id %}" class="btn btn-primary btn-sm">Next Stage</a>
-      {% endif %}
-    </td>
-    <td>
-     {% if b.partner %}
-  <a href="#" class="btn btn-sm btn-outline-primary open-chat" data-booking-id="{{ b.id }}" data-booking-status="{{ b.status }}">
-    Chat
-  </a>
-{% endif %}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="text-center mb-4">
+    <h2 class="fw-bold text-primary">Partner Dashboard</h2>
+    <p class="text-muted">View your assigned bookings and update delivery status.</p>
+</div>
+
+<div class="card p-4">
+    <h5>Assigned Bookings</h5>
+    <hr>
+    {% for booking in bookings %}
+        <div class="border-bottom py-2 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong> — {{ booking.status }}
+                <br><small>Customer: {{ booking.customer.mobile }}</small>
+                <br><small>Pickup: {{ booking.pickup_location }} → Drop: {{ booking.drop_location }}</small>
+            </div>
+            <div class="text-end">
+                {% if booking.status != 'Delivered' and booking.status != 'Cancelled' %}
+                    <form method="POST" action="{% url 'update_status' booking.id %}">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm mb-2" required>
+                            <option value="">Update Status</option>
+                            <option value="Start">Start</option>
+                            <option value="Reached">Reached</option>
+                            <option value="Collected">Collected</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                {% endif %}
+                <button class="btn btn-sm btn-success open-chat" data-booking-id="{{ booking.id }}">Chat</button>
+            </div>
+        </div>
+    {% empty %}
+        <p>No bookings assigned yet.</p>
+    {% endfor %}
+</div>
+
+<!-- Include Chat Modal -->
+{% include 'chat/chat_modal.html' %}
 {% endblock %}
