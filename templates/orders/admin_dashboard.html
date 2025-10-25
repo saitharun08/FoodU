@@ -11,7 +11,7 @@
     <h5>Unassigned Bookings</h5>
     <hr>
     {% for booking in bookings %}
-        {% if not booking.assigned_to and not booking.partner and booking.status != 'cancelled' %}
+        {% if not booking.partner and booking.status != 'cancelled' %}
         <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
             <div>
                 <strong>Order #{{ booking.id }}</strong>
@@ -60,7 +60,7 @@
     <h5>Assigned Bookings</h5>
     <hr>
     {% for booking in bookings %}
-        {% if booking.assigned_to or booking.partner %}
+        {% if booking.partner %}
         <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
             <div>
                 <strong>Order #{{ booking.id }}</strong>
@@ -76,8 +76,6 @@
                 {% endif %}
                 {% if booking.partner %}
                     <br><small>Assigned Partner: <strong>{{ booking.partner.mobile }}</strong></small>
-                {% elif booking.assigned_to %}
-                    <br><small>Assigned Partner: <strong>{{ booking.assigned_to.mobile }}</strong></small>
                 {% endif %}
                 {% if booking.created_at %}
                     <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>

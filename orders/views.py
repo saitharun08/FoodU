@@ -29,7 +29,7 @@ def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, customer=request.user)
     
     # Prevent cancelling if partner is assigned
-    if booking.partner or booking.assigned_to:
+    if booking.partner:
         messages.error(request, "Cannot cancel order. A delivery partner has already been assigned to your order.")
         return redirect('customer_dashboard')
     
@@ -58,9 +58,6 @@ def admin_dashboard(request):
         
         partner = User.objects.get(id=partner_id)
         booking.partner = partner
-        # Keep both fields in sync for templates that reference either
-        if hasattr(booking, 'assigned_to'):
-            booking.assigned_to = partner
         booking.status = 'assigned'
         booking.save()
         messages.success(request, f"Booking {booking_id} assigned to {partner.mobile}")
@@ -116,8 +113,6 @@ def assign_partner(request, booking_id):
         if partner_id:
             partner = User.objects.get(id=partner_id)
             booking.partner = partner
-            if hasattr(booking, 'assigned_to'):
-                booking.assigned_to = partner
             booking.status = 'assigned'
             booking.save()
             messages.success(request, f"Booking {booking.id} assigned to {partner.mobile}")

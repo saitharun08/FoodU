@@ -52,7 +52,7 @@
             </div>
 
             <div>
-                {% if booking.status != 'cancelled' and booking.status != 'delivered' and not booking.partner and not booking.assigned_to %}
+                {% if booking.status != 'cancelled' and booking.status != 'delivered' and not booking.partner %}
                     <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Cancel</a>
                 {% endif %}
                 {% if booking.partner and booking.status != 'cancelled' and booking.status != 'delivered'%}
