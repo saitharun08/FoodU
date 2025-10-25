@@ -12,7 +12,7 @@
     <hr>
     {% for booking in bookings %}
         <div class="border-bottom py-2 d-flex justify-content-between align-items-center">
-            <div>
+            <div>   
                 <strong>Order #{{ booking.id }}</strong> — {{ booking.status }}
                 <br><small>Customer: {{ booking.customer.mobile }}</small>
                 <br><small>Pickup: {{ booking.pickup_location }} → Drop: {{ booking.drop_location }}</small>

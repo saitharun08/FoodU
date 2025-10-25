@@ -46,6 +46,9 @@ def admin_dashboard(request):
         booking = Booking.objects.get(id=booking_id)
         partner = User.objects.get(id=partner_id)
         booking.partner = partner
+        # Keep both fields in sync for templates that reference either
+        if hasattr(booking, 'assigned_to'):
+            booking.assigned_to = partner
         booking.status = 'assigned'
         booking.save()
         messages.success(request, f"Booking {booking_id} assigned to {partner.mobile}")
@@ -79,7 +82,11 @@ def assign_partner(request, booking_id):
         partner_id = request.POST.get('partner_id')
         if partner_id:
             partner = User.objects.get(id=partner_id)
-            booking.assigned_to = partner
+            booking.partner = partner
+            if hasattr(booking, 'assigned_to'):
+                booking.assigned_to = partner
+            booking.status = 'assigned'
             booking.save()
+            messages.success(request, f"Booking {booking.id} assigned to {partner.mobile}")
     return redirect('admin_dashboard')
 
