@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h2 class="fw-bold text-primary">Welcome to FoodU</h2>
+    <p class="text-muted">Order your favorite food and track deliveries in real time!</p>
+</div>
+
+<!-- Create Booking -->
+<div class="card p-4 mb-4">
+    <h5 class="mb-3">Create New Order</h5>
+    <form method="POST" action="{% url 'create_booking' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <input type="text" name="food_item" placeholder="Food Name" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <input type="text" name="address" placeholder="Delivery Address" class="form-control" required>
+            </div>
+            <div class="col-md-2 mb-3 d-grid">
+                <button type="submit" class="btn btn-primary">Place Order</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- List of Bookings -->
+<div class="card p-4">
+    <h5>Your Orders</h5>
+    <hr>
+    {% for booking in bookings %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>🍔 {{ booking.food_item }}</strong>  
+                <br>
+                <span class="text-muted">Address:</span> {{ booking.address }}  
+                <br>
+                <span class="text-muted">Status:</span> 
+                <span class="fw-bold text-{% if booking.status == 'delivered' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                    {{ booking.status|title }}
+                </span>
+                <br>
+                {% if booking.partner %}
+                    <span class="text-muted">Assigned Partner:</span> <strong>{{ booking.partner.mobile }}</strong>
+                {% else %}
+                    <span class="text-muted">Assigned Partner:</span> <span class="text-secondary">Not Assigned Yet</span>
+                {% endif %}
+                <br>
+                <small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+            </div>
+
+            <div>
+                {% if booking.status != 'cancelled' and booking.status != 'delivered' and not booking.partner and not booking.assigned_to %}
+                    <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                {% endif %}
+                {% if booking.partner and booking.status != 'cancelled' and booking.status != 'delivered'%}
+                    <button class="btn btn-sm btn-success open-chat" data-booking-id="{{ booking.id }}">Chat</button>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No orders yet. Create one above!</p>
+    {% endfor %}
+</div>
+
+<!-- Include Chat Modal -->
+{% include 'chat/chat_modal.html' %}
+{% endblock %}

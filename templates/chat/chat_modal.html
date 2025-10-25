@@ -1,0 +1,17 @@
+<div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Chat with Partner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="chatMessages" style="height:300px; overflow-y:auto;"></div>
+            <div class="modal-footer">
+                <input type="text" id="chatInput" class="form-control" placeholder="Type message...">
+                <button id="sendChatBtn" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="userMobile" value="{{ request.user.mobile }}">

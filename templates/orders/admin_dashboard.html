@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h2 class="fw-bold text-primary">Admin Dashboard</h2>
+    <p class="text-muted">Manage all FoodU bookings and assign delivery partners.</p>
+</div>
+
+<div class="card p-4">
+    <h5>Unassigned Bookings</h5>
+    <hr>
+    {% for booking in bookings %}
+        {% if not booking.assigned_to and not booking.partner and booking.status != 'cancelled' %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong>
+                <br><small>Customer Number: {{ booking.customer.mobile }}</small>
+                <br>
+                <span class="text-muted">Status:</span>
+                <span class="fw-bold text-warning">{{ booking.status|title }}</span>
+                {% if booking.food_item %}
+                    <br><small>Order Details: {{ booking.food_item }}</small>
+                {% endif %}
+                {% if booking.address %}
+                    <br><small>Address: {{ booking.address }}</small>
+                {% endif %}
+                {% if booking.created_at %}
+                    <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+                {% endif %}
+            </div>
+            <div>
+                <form method="POST" action="{% url 'assign_partner' booking.id %}" class="d-flex">
+                    {% csrf_token %}
+                    <select name="partner_id" class="form-select form-select-sm me-2" required>
+                        <option value="">Select Partner</option>
+                        {% for partner in partners %}
+                            <option value="{{ partner.id }}">
+                                {{ partner.mobile }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    {% empty %}
+        <p class="text-muted">No unassigned bookings available.</p>
+    {% endfor %}
+</div>
+
+<!-- Separator Line -->
+<div class="my-4">
+    <hr class="border-2">
+</div>
+
+<!-- Assigned Bookings Section -->
+<div class="card p-4 mb-4">
+    <h5>Assigned Bookings</h5>
+    <hr>
+    {% for booking in bookings %}
+        {% if booking.assigned_to or booking.partner %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong>
+                <br><small>Customer Number: {{ booking.customer.mobile }}</small>
+                <br>
+                <span class="text-muted">Status:</span>
+                <span class="fw-bold text-{% if booking.status == 'delivered' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">{{ booking.status|title }}</span>
+                {% if booking.food_item %}
+                    <br><small>Order Details: {{ booking.food_item }}</small>
+                {% endif %}
+                {% if booking.address %}
+                    <br><small>Address: {{ booking.address }}</small>
+                {% endif %}
+                {% if booking.partner %}
+                    <br><small>Assigned Partner: <strong>{{ booking.partner.mobile }}</strong></small>
+                {% elif booking.assigned_to %}
+                    <br><small>Assigned Partner: <strong>{{ booking.assigned_to.mobile }}</strong></small>
+                {% endif %}
+                {% if booking.created_at %}
+                    <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+                {% endif %}
+            </div>
+            <div>
+                <span class="badge bg-success">Assigned</span>
+            </div>
+        </div>
+        {% endif %}
+    {% empty %}
+        <p class="text-muted">No assigned bookings available.</p>
+    {% endfor %}
+</div>
+
+<!-- Separator Line -->
+<div class="my-4">
+    <hr class="border-2">
+</div>
+
+<!-- Cancelled Bookings Section -->
+<div class="card p-4">
+    <h5>Cancelled Orders</h5>
+    <hr>
+    {% for booking in bookings %}
+        {% if booking.status == 'cancelled' %}
+        <div class="border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Order #{{ booking.id }}</strong>
+                <br><small>Customer Number: {{ booking.customer.mobile }}</small>
+                <br>
+                <span class="text-muted">Status:</span>
+                <span class="fw-bold text-danger">{{ booking.status|title }}</span>
+                {% if booking.food_item %}
+                    <br><small>Order Details: {{ booking.food_item }}</small>
+                {% endif %}
+                {% if booking.address %}
+                    <br><small>Address: {{ booking.address }}</small>
+                {% endif %}
+                {% if booking.created_at %}
+                    <br><small class="text-muted">Created On: {{ booking.created_at|date:"M d, Y - H:i A" }}</small>
+                {% endif %}
+            </div>
+            <div>
+                <span class="badge bg-danger">Cancelled</span>
+            </div>
+        </div>
+        {% endif %}
+    {% empty %}
+        <p class="text-muted">No cancelled orders.</p>
+    {% endfor %}
+</div>
+{% endblock %}
