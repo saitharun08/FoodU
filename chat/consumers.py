@@ -60,6 +60,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 "type": "chat.message",
+                "id": chat_obj.id,
                 "message": chat_obj.message,
                 "sender_mobile": user.mobile,
                 "timestamp": chat_obj.timestamp.isoformat(),
@@ -73,8 +74,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
-            "message": event["message"],
-            "sender_mobile": event["sender_mobile"],
-            "timestamp": event["timestamp"],
-            "sender_id": event["sender_id"],
+              "id": event.get("id"),
+              "message": event["message"],
+              "sender_mobile": event["sender_mobile"],
+              "timestamp": event["timestamp"],
+              "sender_id": event["sender_id"],
         }))
